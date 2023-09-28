@@ -1,0 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Sora', sans-serif;
+}
+
+body {
+  font-size: 1rem;
+  background: #f6f5fc;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+button {
+  cursor: pointer;
+}

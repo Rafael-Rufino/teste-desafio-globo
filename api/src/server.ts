@@ -1,5 +1,8 @@
 import { config } from 'dotenv'
+
 import express from 'express'
+
+import router from './routes/userRoutes'
 
 const main = async () => {
   config()
@@ -7,9 +10,7 @@ const main = async () => {
   const port = process.env.PORT || 3333
   app.use(express.json())
 
-  app.get('/', (req, res) => {
-    res.send('Hello World!')
-  })
+  app.use(router)
 
   app.listen(port, () => {
     console.log(`Server running on port ${port}`)

@@ -4,7 +4,7 @@ import express from 'express'
 
 import { cors } from './middlewares/cors'
 
-import router from './routes/userRoutes'
+import router from './routes'
 
 const main = async () => {
   config()

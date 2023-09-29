@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 import theme from '../../assets/styles/themes/default'
 
-export const Container = styled.div`
+export const ContainerModal = styled.div`
   position: absolute;
   z-index: 1000;
   top: 0;
-  margin-top: 140px;
+  margin-top: 170px;
   max-width: 400px;
   width: 100%;
   height: 400px;
@@ -17,15 +17,16 @@ export const Container = styled.div`
 `
 export const Header = styled.header`
   padding: 20px;
-  a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    gap: 0.75rem;
+`
 
-    :hover {
-      opacity: 0.8;
-    }
+export const Link = styled.a`
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 0.75rem;
+
+  :hover {
+    opacity: 0.8;
   }
 `
 
@@ -38,17 +39,21 @@ export const Title = styled.h1`
 export const Logo = styled.img`
   height: 40px;
 `
-export const Informative = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   justify-content: end;
   padding: 10px 20px;
+`
+export const SuggestionSearch = styled.small`
   color: ${theme.colors.gray.light};
   font-size: ${theme.fonts.sizes.xLarge};
 `
-export const SearchContent = styled.div`
+export const SuggestionsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 20px;
+`
+export const Suggestion = styled.div`
   font-size: ${theme.fonts.sizes.xLarge};
   color: ${theme.colors.gray.dark};
 `

@@ -1,7 +1,7 @@
+import * as S from './styles'
+
 import { Divider } from '../divider'
 import { IHighlight } from '../header'
-
-import * as S from './styles'
 
 interface ModalProps {
   searchResults: IHighlight[]
@@ -32,9 +32,7 @@ export const Modal = ({
           ))}
         </S.Header>
       )}
-
       <Divider />
-
       <S.Wrapper>
         <S.SuggestionSearch>Sugestões de busca</S.SuggestionSearch>
       </S.Wrapper>

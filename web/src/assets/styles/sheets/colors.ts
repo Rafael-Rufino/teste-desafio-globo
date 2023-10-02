@@ -12,7 +12,7 @@ export const colors: IColors = {
 
   gray: {
     light: '#BCBCBC',
-    main: '#22222',
+    main: '#222',
     dark: '#333',
   },
 

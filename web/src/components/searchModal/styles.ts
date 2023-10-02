@@ -9,17 +9,12 @@ export const ContainerModal = styled.div`
 
   max-width: 540px;
   width: 100%;
-
-  height: 100%;
-  max-height: 500px;
   overflow: hidden;
 
   border-radius: 8px;
   background: ${theme.colors.white};
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.09);
   padding: 10px 0;
-
-  overflow-y: auto;
 `
 export const Header = styled.header`
   padding: 20px 20px 0 20px;

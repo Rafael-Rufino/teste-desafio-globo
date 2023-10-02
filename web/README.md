@@ -22,7 +22,7 @@
 
 ### Requisitos
 
-- [x] interface contruida com React, typescript e Styled-components
+- [x] interface construida com React, typescript e Styled-components
 
 - [x] incluir as cores e fonts da interface
 
@@ -40,11 +40,9 @@
 
 - [x] (Opcional, bônus) Diferenciar os caracteres que deram match no resultado do live search aplicando negrito.
 
-- [ ] As teclas (↓, ↑) devem navegar pelos links de sugestão e autocompletar o texto já digitado;
-
 - [x] (Opcional, bônus) As teclas (→, ←) preenchem ou removem, respectivamente, o termo com o termo sugerido. Por exemplo: Digitou fla e usuário apertou →, então preenche com flamengo. Se após completar com flamengo, o usuário apertar ←, volta para o termo fla.
 
-- [ ] testes automatizados
+- [x] testes automatizados
 
 <a id="tecnologias-utilizadas"></a>
 
@@ -80,6 +78,15 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias
   ou
   $ npm run dev
 
+```
+
+3. Executando os testes:
+
+```sh
+  # rodando os testes
+  $ yarn test
+  ou
+  $ npm run test
 ```
 
 <a id="como-contribuir"></a>

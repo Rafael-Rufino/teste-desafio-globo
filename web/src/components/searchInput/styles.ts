@@ -4,7 +4,7 @@ import theme from '../../assets/styles/themes/default'
 export const Container = styled.div`
   display: flex;
   align-items: center;
-  max-width: 400px;
+  max-width: 540px;
   width: 100%;
   position: relative;
 `
@@ -29,6 +29,11 @@ export const Input = styled.input`
   font-size: ${theme.fonts.sizes.medium};
   transition: border-color 0.2s ease-in;
   appearance: none;
+  font-weight: ${theme.fonts.weight.bold};
+
+  &::placeholder {
+    font-weight: ${theme.fonts.weight.regular};
+  }
 
   &:focus {
     border: 2px solid ${theme.colors.primary.main};

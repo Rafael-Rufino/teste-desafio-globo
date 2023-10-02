@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react'
+
 import { FiSearch } from 'react-icons/fi'
+
 import theme from '../../assets/styles/themes/default'
-import { getHighlight, getSuggestion } from '../../sdk/modules/getSearch'
+
+import { getHighlight, getSuggestion } from '../../sdk/modules/searchService'
+
 import { normalizeString } from '../../utils/normalizedString'
-import { Modal } from '../modal'
+
 import { SearchInput } from '../searchInput'
+import { SearchModal } from '../searchModal'
+
 import * as S from './styles'
 
 export interface IHighlight {
@@ -19,15 +25,21 @@ interface ISuggestion {
   value: string
 }
 
+function normalizeData(data: ISuggestion[]) {
+  return data.map((item) => ({
+    value: normalizeString(item.value),
+  }))
+}
+
 export const Header = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
   const [query, setQuery] = useState('')
-  const [suggestions, setSuggestions] = useState<ISuggestion[]>([])
-  const [originalSuggestions, setOriginalSuggestions] = useState<ISuggestion[]>(
+  const [initialSuggestions, setInitialSuggestions] = useState<ISuggestion[]>(
     []
   )
-  const [originalHighlights, setOriginalHighlights] = useState<IHighlight[]>([])
-  const [searchResults, setSearchResults] = useState<IHighlight[]>([])
+  const [suggestions, setSuggestions] = useState<ISuggestion[]>([])
+  const [initialHighlights, setInitialHighlights] = useState<IHighlight[]>([])
+  const [highlights, setHighlights] = useState<IHighlight[]>([])
 
   useEffect(() => {
     async function fetchData() {
@@ -37,25 +49,19 @@ export const Header = () => {
           getHighlight(),
         ])
 
-        const normalizedSuggestions = suggestionData.suggestions.map(
-          (suggestion: ISuggestion) => ({
-            value: normalizeString(suggestion.value),
-          })
-        )
+        const normalizedSuggestions = normalizeData(suggestionData.suggestions)
 
         const normalizedHighlights = highlightData.highlights.map(
           (highlight: IHighlight) => ({
             ...highlight,
-            queries: highlight.queries.map((query) => ({
-              value: normalizeString(query.value),
-            })),
+            queries: normalizeData(highlight.queries),
           })
         )
 
-        setSearchResults(normalizedHighlights)
+        setHighlights(normalizedHighlights)
         setSuggestions(normalizedSuggestions)
-        setOriginalSuggestions(normalizedSuggestions)
-        setOriginalHighlights(normalizedHighlights)
+        setInitialSuggestions(normalizedSuggestions)
+        setInitialHighlights(normalizedHighlights)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -65,31 +71,43 @@ export const Header = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target
-    const normalizedValue = normalizeString(value)
+    const normalizedValue = normalizeString(value.trim())
+
     const hasSearchValid = value.length >= 1
 
     setQuery(value)
 
-    const filteredSuggestions = originalSuggestions.filter(
+    const filteredSuggestions = initialSuggestions.filter(
       (suggestion: ISuggestion) => suggestion.value.includes(normalizedValue)
     )
 
-    const filteredResults = originalHighlights.filter((highlight: IHighlight) =>
+    const customSort = (a: ISuggestion, b: ISuggestion) =>
+      a.value.length - b.value.length
+    filteredSuggestions.sort(customSort)
+
+    const filteredResults = initialHighlights.filter((highlight: IHighlight) =>
       highlight.queries.some((highlightQuery) =>
-        normalizeString(highlightQuery.value).includes(normalizedValue)
+        highlightQuery.value.includes(normalizedValue)
       )
     )
 
     setSuggestions(filteredSuggestions)
-    setSearchResults(filteredResults)
-    setIsModalOpen(hasSearchValid)
+    setHighlights(filteredResults)
+    setIsModalVisible(hasSearchValid)
   }
 
-  function handleClosedModal() {
-    setIsModalOpen(false)
-    setSuggestions(originalSuggestions)
-    setSearchResults(originalHighlights)
+  function closeModalAndResetSearch() {
+    setIsModalVisible(false)
+    setQuery('')
+    setSuggestions(initialSuggestions)
+    setHighlights(initialHighlights)
   }
+
+  const suggestionsValues = suggestions.map((suggestion) => suggestion.value)
+
+  const hasSuggestions =
+    suggestions.find((suggestion) => suggestion.value.includes(query))?.value ||
+    query
 
   return (
     <S.ContainerHeader>
@@ -107,14 +125,13 @@ export const Header = () => {
           onChange={handleSearch}
           icon={<FiSearch size={24} color={theme.colors.gray.dark} />}
         />
-        {isModalOpen && (
-          <Modal
-            searchResults={searchResults}
-            suggestions={
-              suggestions.map((suggestion) => suggestion.value) as string[]
-            }
-            isOpen={isModalOpen}
-            onClose={handleClosedModal}
+        {isModalVisible && (
+          <SearchModal
+            searchResults={highlights}
+            suggestionValue={hasSuggestions}
+            suggestions={suggestionsValues}
+            isOpen={isModalVisible}
+            onClose={closeModalAndResetSearch}
           />
         )}
       </S.Content>

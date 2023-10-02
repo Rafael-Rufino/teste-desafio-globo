@@ -31,6 +31,11 @@ function normalizeData(data: ISuggestion[]) {
   }))
 }
 
+const KEY_CODES = {
+  ARROW_RIGHT: 'ArrowRight',
+  ARROW_LEFT: 'ArrowLeft',
+}
+
 export const Header = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [query, setQuery] = useState('')
@@ -111,29 +116,36 @@ export const Header = () => {
     query
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const isArrowRight = event.key === 'ArrowRight'
-    const isArrowLeft = event.key === 'ArrowLeft'
+    const { key } = event
+    const isArrowRight = key === KEY_CODES.ARROW_RIGHT
+    const isArrowLeft = key === KEY_CODES.ARROW_LEFT
 
-    event.preventDefault()
+    if (isArrowRight) {
+      event.preventDefault()
 
-    if (isArrowRight && suggestionIndex < suggestionsValues.length - 1) {
-      setSuggestionIndex(suggestionIndex + 1)
-      setQuery(suggestionsValues[suggestionIndex + 1])
+      if (suggestionIndex < suggestionsValues.length - 1) {
+        setSuggestionIndex(suggestionIndex + 1)
+        setQuery(suggestionsValues[suggestionIndex + 1])
+      }
     } else if (isArrowLeft) {
+      event.preventDefault()
+
       if (suggestionIndex > -1) {
         setSuggestionIndex(suggestionIndex - 1)
-        setQuery(
-          suggestionIndex - 1 >= 0 ? suggestionsValues[suggestionIndex - 1] : ''
-        )
-        resetInput(suggestionIndex - 1 < 0)
+
+        if (suggestionIndex - 1 >= 0) {
+          setQuery(suggestionsValues[suggestionIndex - 1])
+        } else {
+          resetInput()
+        }
       }
     }
   }
 
-  const resetInput = (isNegative: boolean) => {
+  const resetInput = () => {
     setQuery('')
     setHighlights([])
-    setIsModalVisible(!isNegative)
+    setIsModalVisible(false)
   }
 
   return (

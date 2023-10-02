@@ -40,6 +40,7 @@ export const Header = () => {
   const [suggestions, setSuggestions] = useState<ISuggestion[]>([])
   const [initialHighlights, setInitialHighlights] = useState<IHighlight[]>([])
   const [highlights, setHighlights] = useState<IHighlight[]>([])
+  const [suggestionIndex, setSuggestionIndex] = useState(-1)
 
   useEffect(() => {
     async function fetchData() {
@@ -109,6 +110,32 @@ export const Header = () => {
     suggestions.find((suggestion) => suggestion.value.includes(query))?.value ||
     query
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const isArrowRight = event.key === 'ArrowRight'
+    const isArrowLeft = event.key === 'ArrowLeft'
+
+    event.preventDefault()
+
+    if (isArrowRight && suggestionIndex < suggestionsValues.length - 1) {
+      setSuggestionIndex(suggestionIndex + 1)
+      setQuery(suggestionsValues[suggestionIndex + 1])
+    } else if (isArrowLeft) {
+      if (suggestionIndex > -1) {
+        setSuggestionIndex(suggestionIndex - 1)
+        setQuery(
+          suggestionIndex - 1 >= 0 ? suggestionsValues[suggestionIndex - 1] : ''
+        )
+        resetInput(suggestionIndex - 1 < 0)
+      }
+    }
+  }
+
+  const resetInput = (isNegative: boolean) => {
+    setQuery('')
+    setHighlights([])
+    setIsModalVisible(!isNegative)
+  }
+
   return (
     <S.ContainerHeader>
       <S.Wrapper>
@@ -124,6 +151,7 @@ export const Header = () => {
           value={query}
           onChange={handleSearch}
           icon={<FiSearch size={24} color={theme.colors.gray.dark} />}
+          onKeyDown={handleKeyDown}
         />
         {isModalVisible && (
           <SearchModal

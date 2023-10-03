@@ -99,7 +99,7 @@ export const SearchModal = ({
 
           {!hasSearchResults && (
             <S.SearchResultNotFound>
-              Nenhum resultado encontrado
+              <small>Nenhum resultado encontrado</small>
             </S.SearchResultNotFound>
           )}
         </S.ContainerModal>

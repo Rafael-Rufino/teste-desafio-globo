@@ -30,6 +30,8 @@ function normalizeData(data: ISuggestion[]) {
     value: normalizeString(item.value),
   }))
 }
+const sortByLength = (a: ISuggestion, b: ISuggestion) =>
+  a.value.length - b.value.length
 
 const KEY_CODES = {
   ARROW_RIGHT: 'ArrowRight',
@@ -84,17 +86,18 @@ export const Header = () => {
 
     setQuery(value)
 
+    const words = normalizedValue.split(' ')
+
     const filteredSuggestions = initialSuggestions.filter(
-      (suggestion: ISuggestion) => suggestion.value.includes(normalizedValue)
+      (suggestion: ISuggestion) =>
+        words.some((word) => suggestion.value.includes(word))
     )
 
-    const customSort = (a: ISuggestion, b: ISuggestion) =>
-      a.value.length - b.value.length
-    filteredSuggestions.sort(customSort)
+    filteredSuggestions.sort(sortByLength)
 
     const filteredResults = initialHighlights.filter((highlight: IHighlight) =>
       highlight.queries.some((highlightQuery) =>
-        highlightQuery.value.includes(normalizedValue)
+        words.some((word) => highlightQuery.value.includes(word))
       )
     )
 

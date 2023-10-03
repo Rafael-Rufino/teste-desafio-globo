@@ -6,6 +6,7 @@ export const ContainerModal = styled.div`
   z-index: 1000;
   top: 0;
   margin-top: 40px;
+  min-height: 200px;
 
   max-width: 540px;
   width: 100%;
@@ -18,13 +19,15 @@ export const ContainerModal = styled.div`
 `
 export const Header = styled.header`
   padding: 20px 20px 0 20px;
+  a {
+    gap: 0.75rem;
+  }
 `
 
 export const Link = styled.a`
   display: flex;
   align-items: center;
   text-decoration: none;
-  gap: 0.75rem;
   color: ${theme.colors.gray.light};
 
   strong {
@@ -67,9 +70,15 @@ export const Suggestion = styled.small`
 export const SuggestionSearch = styled.div`
   font-size: ${theme.fonts.sizes.large};
   color: ${theme.colors.gray.dark};
+  a {
+    gap: 0.5rem;
+  }
 
   @media (max-width: 480px) {
     font-size: ${theme.fonts.sizes.small};
+    a {
+      gap: 0.375rem;
+    }
   }
 `
 
@@ -78,6 +87,11 @@ export const SearchResultNotFound = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
-  font-size: ${theme.fonts.sizes.xLarge};
-  color: ${theme.colors.gray.light};
+  width: 100%;
+  position: absolute;
+
+  small {
+    font-size: ${theme.fonts.sizes.xLarge};
+    color: ${theme.colors.gray.light};
+  }
 `

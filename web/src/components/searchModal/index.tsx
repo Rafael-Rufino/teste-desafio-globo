@@ -4,7 +4,7 @@ import { IHighlight } from '../header'
 
 import * as S from './styles'
 
-interface SearchModalProps {
+export interface SearchModalProps {
   searchResults: IHighlight[]
   suggestions: string[]
   suggestionValue: string
@@ -26,7 +26,7 @@ export const SearchModal = ({
   return (
     <>
       {isOpen && (
-        <S.ContainerModal onClick={onClose}>
+        <S.ContainerModal role="modal" onClick={onClose}>
           {hasSearchResults && (
             <S.Header>
               {searchResults.map((result) => (

@@ -8,7 +8,7 @@ export const SearchInput = ({ icon, ...rest }: SearchInputProps) => {
   return (
     <S.Container>
       {icon && <S.Icon> {icon}</S.Icon>}
-      <S.Input placeholder="Pesquisar" {...rest} />
+      <S.Input placeholder="Digite sua busca" {...rest} />
     </S.Container>
   )
 }

@@ -24,6 +24,7 @@ module.exports = {
   rules: {
     'jest/expect-expect': 'off',
     'jest/valid-title': 'off',
+    'jest/no-standalone-expect': 'off',
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },

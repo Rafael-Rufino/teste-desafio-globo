@@ -5,7 +5,7 @@ export const ContainerModal = styled.div`
   position: absolute;
   z-index: 1000;
   top: 0;
-  margin-top: 170px;
+  margin-top: 40px;
 
   max-width: 540px;
   width: 100%;

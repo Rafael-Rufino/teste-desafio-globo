@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { FiSearch } from 'react-icons/fi'
 
@@ -46,6 +46,7 @@ export const Header = () => {
   const [initialHighlights, setInitialHighlights] = useState<IHighlight[]>([])
   const [highlights, setHighlights] = useState<IHighlight[]>([])
   const [suggestionIndex, setSuggestionIndex] = useState(-1)
+  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -102,13 +103,6 @@ export const Header = () => {
     setIsModalVisible(hasSearchValid)
   }
 
-  function closeModalAndResetSearch() {
-    setIsModalVisible(false)
-    setQuery('')
-    setSuggestions(initialSuggestions)
-    setHighlights(initialHighlights)
-  }
-
   const suggestionsValues = suggestions.map((suggestion) => suggestion.value)
 
   const hasSuggestions =
@@ -136,18 +130,37 @@ export const Header = () => {
         if (suggestionIndex - 1 >= 0) {
           setQuery(suggestionsValues[suggestionIndex - 1])
         } else {
-          resetInput()
+          closeModalAndResetSearch()
         }
       }
     }
   }
 
-  const resetInput = () => {
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        closeModalAndResetSearch()
+      }
+    }
+
+    if (isModalVisible) {
+      document.addEventListener('mousedown', handleClickOutside)
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isModalVisible])
+
+  function closeModalAndResetSearch() {
     setQuery('')
-    setHighlights([])
     setIsModalVisible(false)
   }
-
   return (
     <S.ContainerHeader>
       <S.Wrapper>
@@ -166,13 +179,15 @@ export const Header = () => {
           onKeyDown={handleKeyDown}
         />
         {isModalVisible && (
-          <SearchModal
-            searchResults={highlights}
-            suggestionValue={hasSuggestions}
-            suggestions={suggestionsValues}
-            isOpen={isModalVisible}
-            onClose={closeModalAndResetSearch}
-          />
+          <S.WrapperModal ref={modalRef}>
+            <SearchModal
+              searchResults={highlights}
+              suggestionValue={hasSuggestions}
+              suggestions={suggestionsValues}
+              isOpen={isModalVisible}
+              onClose={closeModalAndResetSearch}
+            />
+          </S.WrapperModal>
         )}
       </S.Content>
     </S.ContainerHeader>

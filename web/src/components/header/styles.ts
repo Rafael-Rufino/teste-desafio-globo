@@ -27,3 +27,9 @@ export const Logo = styled.img`
   display: flex;
   padding: 20px 20px 50px 20px;
 `
+export const WrapperModal = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+`

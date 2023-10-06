@@ -18,7 +18,7 @@ router.get('/highlights', async (req, res) => {
       },
     })
 
-    res.json({ highlights })
+    res.status(HttpStatusCode.Ok).json({ highlights })
   } catch (error) {
     res
       .status(HttpStatusCode.SERVER_ERROR)
@@ -27,12 +27,18 @@ router.get('/highlights', async (req, res) => {
 })
 
 router.get('/suggestions', async (req, res) => {
-  const suggestions = await prisma.suggestion.findMany({
-    select: {
-      value: true,
-    },
-  })
-  res.status(HttpStatusCode.Ok).json({ suggestions })
+  try {
+    const suggestions = await prisma.suggestion.findMany({
+      select: {
+        value: true,
+      },
+    })
+    res.status(HttpStatusCode.Ok).json({ suggestions })
+  } catch (error) {
+    res
+      .status(HttpStatusCode.SERVER_ERROR)
+      .json({ error: 'Internal server error' })
+  }
 })
 
 export default router

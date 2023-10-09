@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const endpoint = 'http://localhost:8001'
+const PORT = 8001
+const fallbackPort = 3333
+
+const endpoint = `http://localhost:${PORT || fallbackPort}`
 
 const fetch = axios.create({
   baseURL: endpoint,

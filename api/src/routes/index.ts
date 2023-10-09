@@ -30,6 +30,7 @@ router.get('/suggestions', async (req, res) => {
   try {
     const suggestions = await prisma.suggestion.findMany({
       select: {
+        id: true,
         value: true,
       },
     })

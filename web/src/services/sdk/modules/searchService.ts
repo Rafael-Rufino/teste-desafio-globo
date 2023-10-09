@@ -6,7 +6,7 @@ const getHighlight = async () => {
       url: '/highlights',
       method: 'GET',
     })
-    return res.data
+    return Promise.resolve(res.data)
   } catch (error) {
     return Promise.reject(error)
   }
@@ -19,7 +19,7 @@ const getSuggestion = async () => {
       method: 'GET',
     })
 
-    return res.data
+    return Promise.resolve(res.data)
   } catch (error) {
     return Promise.reject(error)
   }

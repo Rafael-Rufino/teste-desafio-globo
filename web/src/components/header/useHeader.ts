@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { getHighlight, getSuggestion } from '../../sdk/modules/searchService'
+
+import {
+  getHighlight,
+  getSuggestion,
+} from '../../services/sdk/modules/searchService'
+
 import { normalizeString } from '../../utils/normalizedString'
+
 import { IHighlight, ISuggestion } from './interface'
 
 const KEY_CODES = {

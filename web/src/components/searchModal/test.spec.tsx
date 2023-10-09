@@ -18,7 +18,16 @@ const props: SearchModalProps = {
       ],
     },
   ],
-  suggestions: ['suggestion1', 'suggestion2'],
+  suggestions: [
+    {
+      id: '1',
+      value: 'música',
+    },
+    {
+      id: '2',
+      value: 'futebol',
+    },
+  ],
   suggestionValue: 'suggestionValue',
   isOpen: true,
   onClose: jest.fn(),

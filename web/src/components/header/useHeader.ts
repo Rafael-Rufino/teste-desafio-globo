@@ -38,7 +38,8 @@ const useHeader = () => {
   }
 
   const filterSuggestionsByQuery = suggestions.filter(
-    (suggestion: ISuggestion) => suggestion.value.includes(query)
+    (suggestion: ISuggestion) =>
+      normalizeString(suggestion.value).includes(normalizeString(query))
   )
 
   useEffect(() => {

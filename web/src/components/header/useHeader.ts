@@ -25,8 +25,8 @@ const useHeader = () => {
   const sortByLength = (a: ISuggestion, b: ISuggestion) =>
     a.value.length - b.value.length
 
-  function normalizeData(data: ISuggestion[]) {
-    return data.map((item) => ({
+  function normalizeData(data: any) {
+    return data.map((item: any) => ({
       value: normalizeString(item.value),
     }))
   }
@@ -48,13 +48,13 @@ const useHeader = () => {
         const normalizedHighlights = highlightData.highlights.map(
           (highlight: IHighlight) => ({
             ...highlight,
-            queries: normalizeData(highlight.queries as ISuggestion[]),
+            queries: normalizeData(highlight.queries),
           })
         )
 
         setHighlights(normalizedHighlights)
-        setSuggestions(normalizedSuggestions as ISuggestion[])
-        setInitialSuggestions(normalizedSuggestions as ISuggestion[])
+        setSuggestions(normalizedSuggestions)
+        setInitialSuggestions(normalizedSuggestions)
         setInitialHighlights(normalizedHighlights)
       } catch (error) {
         console.error('Error fetching data:', error)

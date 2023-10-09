@@ -25,6 +25,7 @@ module.exports = {
     'jest/expect-expect': 'off',
     'jest/valid-title': 'off',
     'jest/no-standalone-expect': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },

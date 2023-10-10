@@ -28,34 +28,29 @@ export const SearchModal = ({
           {hasSearchResults && (
             <>
               <S.Header>
-                {searchResults.map((result) => (
+                {searchResults.map((highlight: IHighlight) => (
                   <S.Link
-                    key={result.id}
-                    href={result.url}
-                    title={`Você será redirecionado para página do Globo.com com a busca ${result.title}`}
+                    key={highlight.id}
+                    href={highlight.url}
+                    title={`Você será redirecionado para página do Globo.com com a busca ${highlight.title}`}
                   >
-                    <S.Logo src={result.logo} alt={result.title} />
-                    <S.Name>{result.title}</S.Name>
+                    <S.Logo src={highlight.logo} alt={highlight.title} />
+                    <S.Name>{highlight.title}</S.Name>
                   </S.Link>
                 ))}
               </S.Header>
-
               <Divider />
-
               <S.Wrapper>
                 <S.Suggestion>Sugestões de busca</S.Suggestion>
               </S.Wrapper>
-
               <S.SuggestionsWrapper>
-                {suggestions.map((suggestion: ISuggestion) => (
-                  <S.SuggestionSearch key={suggestion.id}>
+                {suggestions.map((suggestion: ISuggestion, index) => (
+                  <S.SuggestionSearch key={index}>
                     <strong>{suggestion.value}</strong>
                   </S.SuggestionSearch>
                 ))}
               </S.SuggestionsWrapper>
-
               <Divider />
-
               <S.SuggestionsWrapper>
                 <S.SuggestionSearch>
                   <S.Link
@@ -69,9 +64,7 @@ export const SearchModal = ({
                   </S.Link>
                 </S.SuggestionSearch>
               </S.SuggestionsWrapper>
-
               <Divider />
-
               <S.SuggestionsWrapper>
                 <S.SuggestionSearch>
                   <S.Link

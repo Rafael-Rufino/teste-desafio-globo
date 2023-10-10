@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
 
 export const cors = (req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = ['http://0.0.0.0:5173', req.headers.origin]
+  const origin = req.headers.origin as string
+  const allowedOrigins = ['http://0.0.0.0:5173', origin]
 
-  if (allowedOrigins.includes(req.headers.origin)) {
-    res.setHeader('Access-Control-Allow-Origin', req.headers.origin as string)
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
   }
   res.setHeader('Access-Control-Allow-Methods', '*')
   res.setHeader('Access-Control-Allow-Headers', '*')

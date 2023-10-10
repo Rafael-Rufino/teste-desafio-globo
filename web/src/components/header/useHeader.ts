@@ -74,7 +74,7 @@ const useHeader = () => {
     const { value } = e.target
     const normalizedValue = normalizeString(value.trim())
 
-    const hasSearchValid = value.length >= 1
+    const isSearchNotEmpty = normalizedValue.length > 0
 
     setOriginalValue(normalizedValue)
 
@@ -97,7 +97,7 @@ const useHeader = () => {
 
     setSuggestions(filteredSuggestions)
     setHighlights(filteredResults)
-    setIsModalVisible(hasSearchValid)
+    setIsModalVisible(isSearchNotEmpty)
   }
 
   const handleArrowKeyNavigation = (

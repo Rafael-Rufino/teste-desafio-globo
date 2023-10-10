@@ -20,11 +20,9 @@ const props: SearchModalProps = {
   ],
   suggestions: [
     {
-      id: '1',
       value: 'música',
     },
     {
-      id: '2',
       value: 'futebol',
     },
   ],

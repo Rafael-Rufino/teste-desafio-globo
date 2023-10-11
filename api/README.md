@@ -13,10 +13,41 @@
 
 <strong>API do Live Search, contem 2 array de objetos que listam dados de highlights e suggestions</strong>
 
+## :heavy_check_mark: :iphone: Tablet Banco de Dados
+
+# Diagrama de relacionamento
+
+<h1 align="center">
+    <img alt="home" src="./.github/diagrama_relacionamento.png" width="700px">
+</h1>
+
+# Highlights
+
+<h1 align="center">
+    <img alt="home" src="./.github/tablet_highlight.png" width="700px">
+</h1>
+
+# Queries
+
+<h1 align="center">
+    <img alt="home" src="./.github/tablet_query.png" width="800px">
+</h1>
+
+# Suggestions
+
+<h1 align="center">
+    <img alt="home" src="./.github/tablet_suggestion.png" width="700px">
+</h1>
+
 ### Requisitos
 
+- [x] Servidor feito com Nodejs
+- [x] banco utilizado o Sqlite
 - [x] Deve conter uma rota para lista suggestions
 - [x] Deve conter uma rota para lista highlights
+- [x] Deve ter uma tabela de Highlights
+- [x] Deve ter uma tabela de queries
+- [x] Deve ter uma tabela de Suggestions
 
 <a id="tecnologias-utilizadas"></a>
 

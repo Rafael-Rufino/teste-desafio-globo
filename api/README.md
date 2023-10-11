@@ -15,7 +15,7 @@
 
 ## :heavy_check_mark: :iphone: Tablet Banco de Dados
 
-# Diagrama de relacionamento
+# Diagrama Entidade e Relacionamento
 
 <h1 align="center">
     <img alt="home" src="./.github/diagrama_relacionamento.png" width="700px">

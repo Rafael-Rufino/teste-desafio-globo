@@ -42,7 +42,8 @@
 ### Requisitos
 
 - [x] Servidor feito com Nodejs
-- [x] banco utilizado o Sqlite
+- [x] banco utilizado o postgresql
+- [x] Deve ser utilizado o Docker
 - [x] Deve conter uma rota para lista suggestions
 - [x] Deve conter uma rota para lista highlights
 - [x] Deve ter uma tabela de Highlights
@@ -58,6 +59,7 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias
 - [Typescript](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
 - [Node.js](https://nodejs.org/en/docs)
 - [Prisma](https://www.prisma.io/docs)
+- [Docker]("")
 
 <a id="como-usar"></a>
 

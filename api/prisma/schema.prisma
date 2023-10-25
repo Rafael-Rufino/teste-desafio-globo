@@ -6,26 +6,26 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Highlight {
-  id      String  @id @default(uuid())
+model Highlights {
+  id      String    @id @default(uuid())
   title   String
   url     String
   logo    String
-  queries Query[]
+  queries Queries[]
 }
 
-model Suggestion {
+model Suggestions {
   id    String @id @default(uuid())
   value String
 }
 
-model Query {
-  id          String    @id @default(uuid())
+model Queries {
+  id          String     @id @default(uuid())
   value       String
-  highlight   Highlight @relation(fields: [highlightId], references: [id])
+  highlight   Highlights @relation(fields: [highlightId], references: [id])
   highlightId String
 }

@@ -8,7 +8,7 @@ const router = Router()
 
 router.get('/highlights', async (req, res) => {
   try {
-    const highlights = await prisma.highlight.findMany({
+    const highlights = await prisma.highlights.findMany({
       include: {
         queries: {
           select: {
@@ -28,7 +28,7 @@ router.get('/highlights', async (req, res) => {
 
 router.get('/suggestions', async (req, res) => {
   try {
-    const suggestions = await prisma.suggestion.findMany({
+    const suggestions = await prisma.suggestions.findMany({
       select: {
         value: true,
       },

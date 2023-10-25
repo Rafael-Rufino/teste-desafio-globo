@@ -7,7 +7,6 @@ import routes from './routes'
 
 const main = async () => {
   config()
-
   const app = express()
 
   app.use(cors)
@@ -16,7 +15,7 @@ const main = async () => {
 
   app.use(routes)
 
-  const port = process.env.PORT || 8001
+  const port = process.env.SERVER_PORT || 8001
 
   app.listen(port, () => {
     console.log(`Server running on port ${port}`)

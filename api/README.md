@@ -83,6 +83,14 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias
   ou
   $ npm run dev
 
+ # Passo 3: Crie o Container Docker para a aplicação:
+
+ $ docker-compose up -d
+
+ # Passo 4: Se desejar preencher o banco de dados com dados de teste ou iniciais, execute o seguinte comando de seed:
+$ yarn prisma db seed
+
+
 ```
 
 <a id="como-contribuir"></a>

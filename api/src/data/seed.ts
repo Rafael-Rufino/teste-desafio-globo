@@ -56,7 +56,7 @@ async function main() {
       value: query.value,
     }))
 
-    await prisma.highlight.create({
+    await prisma.highlights.create({
       data: {
         title: highlightData.title,
         url: highlightData.url,
@@ -87,7 +87,7 @@ async function main() {
   ]
 
   for (const suggestionData of suggestions) {
-    await prisma.suggestion.create({
+    await prisma.suggestions.create({
       data: {
         value: suggestionData,
       },

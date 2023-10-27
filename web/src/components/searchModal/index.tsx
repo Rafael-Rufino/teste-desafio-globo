@@ -1,8 +1,12 @@
-import { FiChevronRight } from 'react-icons/fi'
 import * as S from './styles'
 
 import { Divider } from '../divider'
 import { IHighlight, ISuggestion } from '../header/interface'
+import SearchResultNotFound from './components/searchResultNotFound'
+import SuggestionSearchLink from './components/suggestionSearchLink'
+
+import SearchResultList from './components/searchResultList'
+import SearchResultHeader from './components/searchResultHeader'
 
 export interface SearchModalProps {
   searchResults: IHighlight[]
@@ -10,6 +14,7 @@ export interface SearchModalProps {
   suggestionValue: string
   isOpen: boolean
   onClose: () => void
+
 }
 
 export const SearchModal = ({
@@ -18,6 +23,7 @@ export const SearchModal = ({
   suggestionValue,
   isOpen,
   onClose,
+
 }: SearchModalProps) => {
   const hasSearchResults = searchResults.length > 0
 
@@ -27,65 +33,28 @@ export const SearchModal = ({
         <S.ContainerModal role="modal" onClick={onClose}>
           {hasSearchResults && (
             <>
-              <S.Header>
-                {searchResults.map((highlight: IHighlight) => (
-                  <S.Link
-                    key={highlight.id}
-                    href={highlight.url}
-                    title={`Você será redirecionado para página do Globo.com com a busca ${highlight.title}`}
-                  >
-                    <S.Logo src={highlight.logo} alt={highlight.title} />
-                    <S.Name>{highlight.title}</S.Name>
-                  </S.Link>
-                ))}
-              </S.Header>
+              <SearchResultHeader searchResults={searchResults} />
               <Divider />
-              <S.Wrapper>
-                <S.Suggestion>Sugestões de busca</S.Suggestion>
-              </S.Wrapper>
-              <S.SuggestionsWrapper>
-                {suggestions.map((suggestion: ISuggestion, index) => (
-                  <S.SuggestionSearch key={index}>
-                    <strong>{suggestion.value}</strong>
-                  </S.SuggestionSearch>
-                ))}
-              </S.SuggestionsWrapper>
+              <SearchResultList suggestions={suggestions} />
               <Divider />
-              <S.SuggestionsWrapper>
-                <S.SuggestionSearch>
-                  <S.Link
-                    href={`http://g1.globo.com/busca/?q=${encodeURIComponent(
-                      suggestionValue
-                    )}`}
-                    title={`Você será redirecionado para página do Globo.com com a busca ${suggestionValue}`}
-                  >
-                    buscar <strong>'{suggestionValue}'</strong>na Globo.com
-                    <FiChevronRight size={14} />
-                  </S.Link>
-                </S.SuggestionSearch>
-              </S.SuggestionsWrapper>
+              <SuggestionSearchLink
+                suggestionValue={`${suggestionValue} na Globo.com`}
+                searchUrl={`http://g1.globo.com/busca/?q=${encodeURIComponent(
+                  suggestionValue
+                )}`}
+                title={`Você será redirecionado para página do Globo.com com a busca ${suggestionValue}`}
+              />
               <Divider />
-              <S.SuggestionsWrapper>
-                <S.SuggestionSearch>
-                  <S.Link
-                    href={`https://www.google.com/search?q=${encodeURIComponent(
-                      suggestionValue
-                    )}`}
-                    title={`Você será redirecionado para página do Google com a busca ${suggestionValue}`}
-                  >
-                    buscar <strong>'{suggestionValue}'</strong> na Web
-                    <FiChevronRight size={14} />
-                  </S.Link>
-                </S.SuggestionSearch>
-              </S.SuggestionsWrapper>
+              <SuggestionSearchLink
+                suggestionValue={`${suggestionValue} na Web`}
+                searchUrl={`https://www.google.com/search?q=${encodeURIComponent(
+                  suggestionValue
+                )}`}
+                title={`Você será redirecionado para página do Google com a busca ${suggestionValue}`}
+              />
             </>
           )}
-
-          {!hasSearchResults && (
-            <S.SearchResultNotFound>
-              <small>Nenhum resultado encontrado</small>
-            </S.SearchResultNotFound>
-          )}
+          {!hasSearchResults && <SearchResultNotFound />}
         </S.ContainerModal>
       )}
     </>

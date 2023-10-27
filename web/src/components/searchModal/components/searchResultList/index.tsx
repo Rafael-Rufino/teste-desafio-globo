@@ -1,5 +1,4 @@
-import { ISuggestion } from '../../../header/interface'
-
+import { ISuggestion } from '../../../../entities'
 import * as S from './styles'
 
 interface SearchResultListProps {

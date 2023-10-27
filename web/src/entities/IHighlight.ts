@@ -5,7 +5,3 @@ export interface IHighlight {
   logo: string
   queries: { value: string }[]
 }
-
-export interface ISuggestion {
-  value: string
-}

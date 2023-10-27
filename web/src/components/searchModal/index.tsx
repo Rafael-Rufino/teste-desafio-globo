@@ -1,12 +1,13 @@
 import * as S from './styles'
 
 import { Divider } from '../divider'
-import { IHighlight, ISuggestion } from '../header/interface'
+
 import SearchResultNotFound from './components/searchResultNotFound'
 import SuggestionSearchLink from './components/suggestionSearchLink'
 
 import SearchResultList from './components/searchResultList'
 import SearchResultHeader from './components/searchResultHeader'
+import { IHighlight, ISuggestion } from '../../entities'
 
 export interface SearchModalProps {
   searchResults: IHighlight[]
@@ -14,7 +15,6 @@ export interface SearchModalProps {
   suggestionValue: string
   isOpen: boolean
   onClose: () => void
-
 }
 
 export const SearchModal = ({
@@ -23,7 +23,6 @@ export const SearchModal = ({
   suggestionValue,
   isOpen,
   onClose,
-
 }: SearchModalProps) => {
   const hasSearchResults = searchResults.length > 0
 

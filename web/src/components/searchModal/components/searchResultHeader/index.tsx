@@ -1,4 +1,4 @@
-import { IHighlight } from '../../../header/interface'
+import { IHighlight } from '../../../../entities'
 import * as S from './styles'
 
 interface SearchResultHeaderProps {

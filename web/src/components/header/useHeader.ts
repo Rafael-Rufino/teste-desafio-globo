@@ -7,8 +7,8 @@ import {
 
 import { normalizeString } from '../../utils/normalizedString'
 
-import { IHighlight, ISuggestion } from './interface'
 import { KEY_CODES } from '../../constants/key-codes'
+import { ISuggestion, IHighlight } from '../../entities'
 
 const useHeader = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)

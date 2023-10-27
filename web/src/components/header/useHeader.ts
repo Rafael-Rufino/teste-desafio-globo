@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   getHighlight,
@@ -8,15 +8,12 @@ import {
 import { normalizeString } from '../../utils/normalizedString'
 
 import { IHighlight, ISuggestion } from './interface'
-
-const KEY_CODES = {
-  ARROW_RIGHT: 'ArrowRight',
-  ARROW_LEFT: 'ArrowLeft',
-}
+import { KEY_CODES } from '../../constants/key-codes'
 
 const useHeader = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [query, setQuery] = useState('')
+
   const [initialSuggestions, setInitialSuggestions] = useState<ISuggestion[]>(
     []
   )
@@ -37,102 +34,108 @@ const useHeader = () => {
     }))
   }
 
+  const getSuggestions = useCallback(async () => {
+    try {
+      const suggestionData = await getSuggestion()
+      const normalizedSuggestions = normalizeData(suggestionData.suggestions)
+
+      setInitialSuggestions(normalizedSuggestions)
+    } catch (error) {
+      console.error('Error fetching suggestions:', error)
+    }
+  }, [])
+
+  const getHighlights = useCallback(async () => {
+    try {
+      const highlightData = await getHighlight()
+      const normalizedHighlights = highlightData.highlights.map(
+        (highlight: IHighlight) => ({
+          ...highlight,
+          queries: normalizeData(highlight.queries),
+        })
+      )
+
+      setInitialHighlights(normalizedHighlights)
+    } catch (error) {
+      console.error('Error fetching highlights:', error)
+    }
+  }, [])
+
   const filterSuggestionsByQuery = suggestions.filter(
     (suggestion: ISuggestion) =>
       normalizeString(suggestion.value).includes(normalizeString(query))
   )
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [suggestionData, highlightData] = await Promise.all([
-          getSuggestion(),
-          getHighlight(),
-        ])
+    getSuggestions()
+    getHighlights()
+  }, [getSuggestions, getHighlights])
 
-        const normalizedSuggestions = normalizeData(suggestionData.suggestions)
+  const handleSearch = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target
+      const normalizedValue = normalizeString(value.trim())
 
-        const normalizedHighlights = highlightData.highlights.map(
-          (highlight: IHighlight) => ({
-            ...highlight,
-            queries: normalizeData(highlight.queries),
-          })
-        )
+      const isSearchNotEmpty = normalizedValue.length > 0
 
-        setHighlights(normalizedHighlights)
-        setSuggestions(normalizedSuggestions)
-        setInitialSuggestions(normalizedSuggestions)
-        setInitialHighlights(normalizedHighlights)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    }
-    fetchData()
-  }, [])
+      setOriginalValue(normalizedValue)
+      setQuery(value)
+      const words = normalizedValue.split(' ')
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
-    const normalizedValue = normalizeString(value.trim())
-
-    const isSearchNotEmpty = normalizedValue.length > 0
-
-    setOriginalValue(normalizedValue)
-
-    setQuery(value)
-
-    const words = normalizedValue.split(' ')
-
-    const filteredSuggestions = initialSuggestions.filter(
-      (suggestion: ISuggestion) =>
-        words.some((word) => suggestion.value.includes(word))
-    )
-
-    filteredSuggestions.sort(sortByLength)
-
-    const filteredResults = initialHighlights.filter((highlight: IHighlight) =>
-      highlight.queries.some((highlightQuery) =>
-        words.some((word) => highlightQuery.value.includes(word))
+      const filteredSuggestions = initialSuggestions.filter(
+        (suggestion: ISuggestion) =>
+          words.some((word) => suggestion.value.includes(word))
       )
-    )
 
-    setSuggestions(filteredSuggestions)
-    setHighlights(filteredResults)
-    setIsModalVisible(isSearchNotEmpty)
-  }
+      filteredSuggestions.sort(sortByLength)
 
-  const handleArrowKeyNavigation = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    const { key } = event
-    const isArrowRight = key === KEY_CODES.ARROW_RIGHT
-    const isArrowLeft = key === KEY_CODES.ARROW_LEFT
+      const filteredResults = initialHighlights.filter(
+        (highlight: IHighlight) =>
+          highlight.queries.some((highlightQuery) =>
+            words.some((word) => highlightQuery.value.includes(word))
+          )
+      )
 
-    if (isArrowRight) {
-      event.preventDefault()
+      setSuggestions(filteredSuggestions)
+      setHighlights(filteredResults)
+      setIsModalVisible(isSearchNotEmpty)
+    },
+    [suggestionIndex, originalValue, initialSuggestions, initialHighlights]
+  )
 
-      if (suggestionIndex < filterSuggestionsByQuery.length - 1) {
-        setSuggestionIndex(suggestionIndex + 1)
-        setQuery(filterSuggestionsByQuery[suggestionIndex + 1].value)
-      }
-    } else if (isArrowLeft) {
-      event.preventDefault()
+  const handleArrowKeyNavigation = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const isArrowRight = event.key === KEY_CODES.ARROW_RIGHT
+      const isArrowLeft = event.key === KEY_CODES.ARROW_LEFT
 
-      if (suggestionIndex > -1) {
-        if (suggestionIndex - 1 >= 0) {
-          setSuggestionIndex(suggestionIndex - 1)
-          setQuery(filterSuggestionsByQuery[suggestionIndex - 1].value)
-        } else {
-          setQuery(originalValue)
-          setSuggestionIndex(-1)
+      if (isArrowRight) {
+        event.preventDefault()
+
+        if (suggestionIndex < filterSuggestionsByQuery.length - 1) {
+          setSuggestionIndex(suggestionIndex + 1)
+          setQuery(filterSuggestionsByQuery[suggestionIndex + 1].value)
+        }
+      } else if (isArrowLeft) {
+        event.preventDefault()
+
+        if (suggestionIndex > -1) {
+          if (suggestionIndex - 1 >= 0) {
+            setSuggestionIndex(suggestionIndex - 1)
+            setQuery(filterSuggestionsByQuery[suggestionIndex - 1].value)
+          } else {
+            setQuery(originalValue)
+            setSuggestionIndex(-1)
+          }
         }
       }
-    }
-  }
+    },
+    [filterSuggestionsByQuery, originalValue, suggestionIndex]
+  )
 
-  function closeModalAndResetSearch() {
+  const closeModalAndResetSearch = useCallback(() => {
     setQuery('')
     setIsModalVisible(false)
-  }
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -153,7 +156,7 @@ const useHeader = () => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isModalVisible])
+  }, [isModalVisible, closeModalAndResetSearch])
 
   return {
     closeModalAndResetSearch,
@@ -164,6 +167,7 @@ const useHeader = () => {
     handleArrowKeyNavigation,
     modalRef,
     query,
+    setQuery,
   }
 }
 

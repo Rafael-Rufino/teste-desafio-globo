@@ -1,6 +1,7 @@
 import { FiSearch } from 'react-icons/fi'
 
 import theme from '../../assets/styles/themes/default'
+
 import * as S from './styles'
 
 import { SearchInput } from '../searchInput'
@@ -11,7 +12,7 @@ import useHeader from './useHeader'
 export const Header = () => {
   const {
     closeModalAndResetSearch,
-    filterSuggestionsByQuery,
+    filteredSuggestionsByQuery,
     isModalVisible,
     highlights,
     handleSearch,
@@ -40,7 +41,7 @@ export const Header = () => {
           <S.WrapperModal ref={modalRef}>
             <SearchModal
               searchResults={highlights}
-              suggestions={filterSuggestionsByQuery}
+              suggestions={filteredSuggestionsByQuery}
               suggestionValue={query}
               isOpen={isModalVisible}
               onClose={closeModalAndResetSearch}

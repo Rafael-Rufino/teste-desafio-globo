@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 
 import {
   getHighlight,
@@ -6,14 +6,12 @@ import {
 } from '../../services/sdk/modules/searchService'
 
 import { normalizeString } from '../../utils/normalizedString'
-
 import { KEY_CODES } from '../../constants/key-codes'
 import { ISuggestion, IHighlight } from '../../entities'
 
 const useHeader = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [query, setQuery] = useState('')
-
   const [initialSuggestions, setInitialSuggestions] = useState<ISuggestion[]>(
     []
   )
@@ -22,7 +20,6 @@ const useHeader = () => {
   const [highlights, setHighlights] = useState<IHighlight[]>([])
   const [suggestionIndex, setSuggestionIndex] = useState(-1)
   const [originalValue, setOriginalValue] = useState('')
-
   const modalRef = useRef<HTMLDivElement>(null)
 
   const sortByLength = (a: ISuggestion, b: ISuggestion) =>
@@ -38,7 +35,6 @@ const useHeader = () => {
     try {
       const suggestionData = await getSuggestion()
       const normalizedSuggestions = normalizeData(suggestionData.suggestions)
-
       setInitialSuggestions(normalizedSuggestions)
     } catch (error) {
       console.error('Error fetching suggestions:', error)
@@ -54,17 +50,17 @@ const useHeader = () => {
           queries: normalizeData(highlight.queries),
         })
       )
-
       setInitialHighlights(normalizedHighlights)
     } catch (error) {
       console.error('Error fetching highlights:', error)
     }
   }, [])
 
-  const filterSuggestionsByQuery = suggestions.filter(
-    (suggestion: ISuggestion) =>
+  const filteredSuggestionsByQuery = useMemo(() => {
+    return suggestions.filter((suggestion: ISuggestion) =>
       normalizeString(suggestion.value).includes(normalizeString(query))
-  )
+    )
+  }, [suggestions])
 
   useEffect(() => {
     getSuggestions()
@@ -74,20 +70,26 @@ const useHeader = () => {
   const handleSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target
-      const normalizedValue = normalizeString(value.trim())
 
+      const normalizedValue = normalizeString(value.trim())
       const isSearchNotEmpty = normalizedValue.length > 0
 
       setOriginalValue(normalizedValue)
       setQuery(value)
+
       const words = normalizedValue.split(' ')
 
-      const filteredSuggestions = initialSuggestions.filter(
-        (suggestion: ISuggestion) =>
-          words.some((word) => suggestion.value.includes(word))
-      )
+      const filteredSuggestions = initialSuggestions
+        .filter((suggestion: ISuggestion) => {
+          const normalizedSuggestion = normalizeString(suggestion.value)
 
-      filteredSuggestions.sort(sortByLength)
+          const searchWords = words.map(normalizeString)
+
+          return searchWords.every((word) =>
+            normalizedSuggestion.includes(word)
+          )
+        })
+        .sort(sortByLength)
 
       const filteredResults = initialHighlights.filter(
         (highlight: IHighlight) =>
@@ -111,9 +113,9 @@ const useHeader = () => {
       if (isArrowRight) {
         event.preventDefault()
 
-        if (suggestionIndex < filterSuggestionsByQuery.length - 1) {
+        if (suggestionIndex < filteredSuggestionsByQuery.length - 1) {
           setSuggestionIndex(suggestionIndex + 1)
-          setQuery(filterSuggestionsByQuery[suggestionIndex + 1].value)
+          setQuery(filteredSuggestionsByQuery[suggestionIndex + 1].value)
         }
       } else if (isArrowLeft) {
         event.preventDefault()
@@ -121,7 +123,7 @@ const useHeader = () => {
         if (suggestionIndex > -1) {
           if (suggestionIndex - 1 >= 0) {
             setSuggestionIndex(suggestionIndex - 1)
-            setQuery(filterSuggestionsByQuery[suggestionIndex - 1].value)
+            setQuery(filteredSuggestionsByQuery[suggestionIndex - 1].value)
           } else {
             setQuery(originalValue)
             setSuggestionIndex(-1)
@@ -129,7 +131,7 @@ const useHeader = () => {
         }
       }
     },
-    [filterSuggestionsByQuery, originalValue, suggestionIndex]
+    [filteredSuggestionsByQuery, originalValue, suggestionIndex]
   )
 
   const closeModalAndResetSearch = useCallback(() => {
@@ -160,14 +162,13 @@ const useHeader = () => {
 
   return {
     closeModalAndResetSearch,
-    filterSuggestionsByQuery,
     isModalVisible,
     highlights,
     handleSearch,
     handleArrowKeyNavigation,
+    filteredSuggestionsByQuery,
     modalRef,
     query,
-    setQuery,
   }
 }
 

@@ -2,7 +2,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react'
 import { SearchModal, SearchModalProps } from './'
 
 const props: SearchModalProps = {
-  searchResults: [
+  highlightSearchResult: [
     {
       id: '1',
       title: 'Pop & Art',
@@ -10,9 +10,11 @@ const props: SearchModalProps = {
       logo: 'http://s.glbimg.com/bu/i/fc/5fb2e18d-a47f-4bb8-9a7e-b66871cf53c0.png',
       queries: [
         {
+          id: '1',
           value: 'música',
         },
         {
+          id: '2',
           value: 'pop',
         },
       ],
@@ -20,9 +22,11 @@ const props: SearchModalProps = {
   ],
   suggestions: [
     {
+      id: '1',
       value: 'música',
     },
     {
+      id: '2',
       value: 'futebol',
     },
   ],
@@ -45,11 +49,11 @@ test('should close modal when clicking outside', async () => {
   })
 })
 
-test('renders SearchModal component without search results', () => {
+test('renders SearchModal component without highlight search results', () => {
   const noResultsProps: SearchModalProps = {
     ...props,
-    searchResults: [],
+    highlightSearchResult: [],
   }
   const { getByText } = render(<SearchModal {...noResultsProps} />)
-  expect(getByText('Nenhum resultado encontrado')).toBeInTheDocument()
+  expect(getByText('Nenhum resultado encontrado'))
 })

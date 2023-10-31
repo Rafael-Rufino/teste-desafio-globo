@@ -36,7 +36,7 @@ const useHeader = () => {
     }))
   }
 
-  const getSuggestions = useCallback(async () => {
+  const fetchSuggestions = useCallback(async () => {
     try {
       const suggestionData = await getSuggestion()
       const normalizedSuggestions = normalizeData(suggestionData.suggestions)
@@ -46,7 +46,7 @@ const useHeader = () => {
     }
   }, [])
 
-  const getHighlights = useCallback(async () => {
+  const fetchHighlights = useCallback(async () => {
     try {
       const highlightData = await getHighlight()
 
@@ -69,9 +69,9 @@ const useHeader = () => {
   }, [suggestions])
 
   useEffect(() => {
-    getSuggestions()
-    getHighlights()
-  }, [getSuggestions, getHighlights])
+    fetchSuggestions()
+    fetchHighlights()
+  }, [fetchSuggestions, fetchHighlights])
 
   const handleSearchChange = useCallback(() => {
     const inputValue = inputRef.current?.value || ''
@@ -82,7 +82,6 @@ const useHeader = () => {
     setQuery(inputValue)
 
     const words = normalizedInputValue.split(' ')
-
     const filteredSuggestions = filterSuggestions(words)
     const filteredHighlightsByQuery = filterHighlightsByQuery(words)
 
@@ -91,15 +90,20 @@ const useHeader = () => {
     setIsModalVisible(isSearchNotEmpty)
   }, [suggestionIndex, originalValue, initialSuggestions, initialHighlights])
 
-  function filterSuggestions(words: string[]) {
-    return initialSuggestions
-      .filter((suggestion) => {
-        const normalizedSuggestion = normalizeString(suggestion.value)
-        const searchWords = words.map(normalizeString)
-        return searchWords.every((word) => normalizedSuggestion.includes(word))
-      })
-      .sort(sortByLength)
-  }
+  const filterSuggestions = useCallback(
+    (words: string[]) => {
+      return initialSuggestions
+        .filter((suggestion) => {
+          const normalizedSuggestion = normalizeString(suggestion.value)
+          const searchWords = words.map(normalizeString)
+          return searchWords.every((word) =>
+            normalizedSuggestion.includes(word)
+          )
+        })
+        .sort(sortByLength)
+    },
+    [initialSuggestions]
+  )
 
   const filterHighlightsByQuery = useCallback(
     (words: string[]) => {

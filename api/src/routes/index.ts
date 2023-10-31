@@ -12,6 +12,7 @@ router.get('/highlights', async (req, res) => {
       include: {
         queries: {
           select: {
+            id: true,
             value: true,
           },
         },
@@ -30,6 +31,7 @@ router.get('/suggestions', async (req, res) => {
   try {
     const suggestions = await prisma.suggestions.findMany({
       select: {
+        id: true,
         value: true,
       },
     })

@@ -8,6 +8,7 @@ import { SearchInput } from '../searchInput'
 import { SearchModal } from '../searchModal'
 
 import useHeader from './useHeader'
+import { useDebounce } from '../../hooks/useDebounce'
 
 export const Header = () => {
   const {
@@ -15,11 +16,14 @@ export const Header = () => {
     filteredSuggestionsByQuery,
     isModalVisible,
     highlights,
-    handleSearch,
     modalRef,
     query,
     handleArrowKeyNavigation,
+    handleSearchChange,
+    inputRef,
   } = useHeader()
+
+  const debouncedHandleSearch = useDebounce(handleSearchChange, 500)
 
   return (
     <S.ContainerHeader>
@@ -31,16 +35,15 @@ export const Header = () => {
       </S.Wrapper>
       <S.Content>
         <SearchInput
-          type="text"
-          value={query}
-          onChange={handleSearch}
+          ref={inputRef}
+          onChange={debouncedHandleSearch}
           icon={<FiSearch size={24} color={theme.colors.gray.dark} />}
           onKeyDown={handleArrowKeyNavigation}
         />
         {isModalVisible && (
           <S.WrapperModal ref={modalRef}>
             <SearchModal
-              searchResults={highlights}
+              highlightSearchResult={highlights}
               suggestions={filteredSuggestionsByQuery}
               suggestionValue={query}
               isOpen={isModalVisible}

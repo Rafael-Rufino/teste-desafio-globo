@@ -20,13 +20,18 @@ const useHeader = () => {
   const [highlights, setHighlights] = useState<IHighlight[]>([])
   const [suggestionIndex, setSuggestionIndex] = useState(-1)
   const [originalValue, setOriginalValue] = useState('')
+
   const modalRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const sortByLength = (a: ISuggestion, b: ISuggestion) =>
     a.value.length - b.value.length
 
-  function normalizeData(data: any) {
-    return data.map((item: any) => ({
+  function normalizeData<T extends { id: string; value: string }>(
+    data: T[]
+  ): T[] {
+    return data.map((item) => ({
+      ...item,
       value: normalizeString(item.value),
     }))
   }
@@ -44,6 +49,7 @@ const useHeader = () => {
   const getHighlights = useCallback(async () => {
     try {
       const highlightData = await getHighlight()
+
       const normalizedHighlights = highlightData.highlights.map(
         (highlight: IHighlight) => ({
           ...highlight,
@@ -58,7 +64,7 @@ const useHeader = () => {
 
   const filteredSuggestionsByQuery = useMemo(() => {
     return suggestions.filter((suggestion: ISuggestion) =>
-      normalizeString(suggestion.value).includes(normalizeString(query))
+      normalizeString(suggestion.value).includes(normalizeString(query.trim()))
     )
   }, [suggestions])
 
@@ -67,42 +73,43 @@ const useHeader = () => {
     getHighlights()
   }, [getSuggestions, getHighlights])
 
-  const handleSearch = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = e.target
+  const handleSearchChange = useCallback(() => {
+    const inputValue = inputRef.current?.value || ''
+    const normalizedInputValue = normalizeString(inputValue.trim())
+    const isSearchNotEmpty = normalizedInputValue.length > 0
 
-      const normalizedValue = normalizeString(value.trim())
-      const isSearchNotEmpty = normalizedValue.length > 0
+    setOriginalValue(normalizedInputValue)
+    setQuery(inputValue)
 
-      setOriginalValue(normalizedValue)
-      setQuery(value)
+    const words = normalizedInputValue.split(' ')
 
-      const words = normalizedValue.split(' ')
+    const filteredSuggestions = filterSuggestions(words)
+    const filteredHighlightsByQuery = filterHighlightsByQuery(words)
 
-      const filteredSuggestions = initialSuggestions
-        .filter((suggestion: ISuggestion) => {
-          const normalizedSuggestion = normalizeString(suggestion.value)
+    setSuggestions(filteredSuggestions)
+    setHighlights(filteredHighlightsByQuery)
+    setIsModalVisible(isSearchNotEmpty)
+  }, [suggestionIndex, originalValue, initialSuggestions, initialHighlights])
 
-          const searchWords = words.map(normalizeString)
+  function filterSuggestions(words: string[]) {
+    return initialSuggestions
+      .filter((suggestion) => {
+        const normalizedSuggestion = normalizeString(suggestion.value)
+        const searchWords = words.map(normalizeString)
+        return searchWords.every((word) => normalizedSuggestion.includes(word))
+      })
+      .sort(sortByLength)
+  }
 
-          return searchWords.every((word) =>
-            normalizedSuggestion.includes(word)
-          )
-        })
-        .sort(sortByLength)
-
-      const filteredResults = initialHighlights.filter(
-        (highlight: IHighlight) =>
-          highlight.queries.some((highlightQuery) =>
-            words.some((word) => highlightQuery.value.includes(word))
-          )
+  const filterHighlightsByQuery = useCallback(
+    (words: string[]) => {
+      return initialHighlights.filter((highlight) =>
+        highlight.queries.some((highlightQuery) =>
+          words.some((word) => highlightQuery.value.includes(word))
+        )
       )
-
-      setSuggestions(filteredSuggestions)
-      setHighlights(filteredResults)
-      setIsModalVisible(isSearchNotEmpty)
     },
-    [suggestionIndex, originalValue, initialSuggestions, initialHighlights]
+    [initialHighlights]
   )
 
   const handleArrowKeyNavigation = useCallback(
@@ -164,11 +171,12 @@ const useHeader = () => {
     closeModalAndResetSearch,
     isModalVisible,
     highlights,
-    handleSearch,
+    handleSearchChange,
     handleArrowKeyNavigation,
     filteredSuggestionsByQuery,
     modalRef,
     query,
+    inputRef,
   }
 }
 

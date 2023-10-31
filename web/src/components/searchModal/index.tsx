@@ -6,11 +6,11 @@ import SearchResultNotFound from './components/searchResultNotFound'
 import SuggestionSearchLink from './components/suggestionSearchLink'
 
 import SearchResultList from './components/searchResultList'
-import SearchResultHeader from './components/searchResultHeader'
+import SearchResultHeader from './components/highlightSearchResult'
 import { IHighlight, ISuggestion } from '../../entities'
 
 export interface SearchModalProps {
-  searchResults: IHighlight[]
+  highlightSearchResult: IHighlight[]
   suggestions: ISuggestion[]
   suggestionValue: string
   isOpen: boolean
@@ -18,13 +18,13 @@ export interface SearchModalProps {
 }
 
 export const SearchModal = ({
-  searchResults,
+  highlightSearchResult,
   suggestions,
   suggestionValue,
   isOpen,
   onClose,
 }: SearchModalProps) => {
-  const hasSearchResults = searchResults.length > 0
+  const hasSearchResults = highlightSearchResult.length > 0
 
   return (
     <>
@@ -32,7 +32,9 @@ export const SearchModal = ({
         <S.ContainerModal role="modal" onClick={onClose}>
           {hasSearchResults && (
             <>
-              <SearchResultHeader searchResults={searchResults} />
+              <SearchResultHeader
+                highlightSearchResult={highlightSearchResult}
+              />
               <Divider />
               <SearchResultList suggestions={suggestions} />
               <Divider />

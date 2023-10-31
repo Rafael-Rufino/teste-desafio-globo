@@ -12,8 +12,8 @@ const SearchResultList = ({ suggestions }: SearchResultListProps) => {
         <S.Suggestion>Sugestões de busca</S.Suggestion>
       </S.Wrapper>
       <S.SuggestionsWrapper>
-        {suggestions.map((suggestion: ISuggestion, index) => (
-          <S.SuggestionSearch key={index}>
+        {suggestions.map((suggestion: ISuggestion) => (
+          <S.SuggestionSearch key={suggestion.id}>
             <strong>{suggestion.value}</strong>
           </S.SuggestionSearch>
         ))}

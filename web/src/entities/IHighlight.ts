@@ -3,5 +3,5 @@ export interface IHighlight {
   title: string
   url: string
   logo: string
-  queries: { value: string }[]
+  queries: { id: string; value: string }[]
 }

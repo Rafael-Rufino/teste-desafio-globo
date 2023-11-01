@@ -11,7 +11,6 @@ import { ISuggestion, IHighlight } from '../../entities'
 
 const useHeader = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [query, setQuery] = useState('')
   const [initialSuggestions, setInitialSuggestions] = useState<ISuggestion[]>(
     []
   )
@@ -64,7 +63,9 @@ const useHeader = () => {
 
   const filteredSuggestionsByQuery = useMemo(() => {
     return suggestions.filter((suggestion: ISuggestion) =>
-      normalizeString(suggestion.value).includes(normalizeString(query.trim()))
+      normalizeString(suggestion.value).includes(
+        normalizeString(inputRef.current?.value?.trim() || '')
+      )
     )
   }, [suggestions])
 
@@ -79,7 +80,6 @@ const useHeader = () => {
     const isSearchNotEmpty = normalizedInputValue.length > 0
 
     setOriginalValue(normalizedInputValue)
-    setQuery(inputValue)
 
     const words = normalizedInputValue.split(' ')
     const filteredSuggestions = filterSuggestions(words)
@@ -120,33 +120,67 @@ const useHeader = () => {
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       const isArrowRight = event.key === KEY_CODES.ARROW_RIGHT
       const isArrowLeft = event.key === KEY_CODES.ARROW_LEFT
-
       if (isArrowRight) {
-        event.preventDefault()
-
-        if (suggestionIndex < filteredSuggestionsByQuery.length - 1) {
-          setSuggestionIndex(suggestionIndex + 1)
-          setQuery(filteredSuggestionsByQuery[suggestionIndex + 1].value)
-        }
+        handleArrowRight(event)
       } else if (isArrowLeft) {
-        event.preventDefault()
+        handleArrowLeft(event)
+      }
+    },
+    [suggestionIndex, filteredSuggestionsByQuery, originalValue, inputRef]
+  )
 
-        if (suggestionIndex > -1) {
-          if (suggestionIndex - 1 >= 0) {
-            setSuggestionIndex(suggestionIndex - 1)
-            setQuery(filteredSuggestionsByQuery[suggestionIndex - 1].value)
-          } else {
-            setQuery(originalValue)
-            setSuggestionIndex(-1)
-          }
+  const handleArrowRight = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      event.preventDefault()
+      if (canIncrementSuggestionIndex()) {
+        updateInputValue(filteredSuggestionsByQuery[suggestionIndex + 1]?.value)
+        setSuggestionIndex(suggestionIndex + 1)
+      }
+    },
+    [suggestionIndex, filteredSuggestionsByQuery, setSuggestionIndex]
+  )
+
+  const handleArrowLeft = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      event.preventDefault()
+      if (canDecrementSuggestionIndex()) {
+        const prevSuggestion = filteredSuggestionsByQuery[suggestionIndex - 1]
+        if (prevSuggestion) {
+          updateInputValue(prevSuggestion.value)
+          setSuggestionIndex(suggestionIndex - 1)
+        } else {
+          resetInputToOriginalValue()
         }
       }
     },
-    [filteredSuggestionsByQuery, originalValue, suggestionIndex]
+    [suggestionIndex, filteredSuggestionsByQuery, setSuggestionIndex]
   )
 
+  const canIncrementSuggestionIndex = () => {
+    return suggestionIndex < filteredSuggestionsByQuery.length - 1
+  }
+
+  const canDecrementSuggestionIndex = () => {
+    return suggestionIndex > -1 && suggestionIndex - 1 >= 0
+  }
+
+  const updateInputValue = (value: string) => {
+    if (inputRef.current) {
+      inputRef.current.value = value
+    }
+  }
+
+  const resetInputToOriginalValue = () => {
+    if (inputRef.current) {
+      inputRef.current.value = originalValue
+    }
+    setSuggestionIndex(-1)
+  }
+
   const closeModalAndResetSearch = useCallback(() => {
-    setQuery('')
+    if (inputRef.current) {
+      inputRef.current.value = ''
+    }
     setIsModalVisible(false)
   }, [])
 
@@ -179,7 +213,6 @@ const useHeader = () => {
     handleArrowKeyNavigation,
     filteredSuggestionsByQuery,
     modalRef,
-    query,
     inputRef,
   }
 }

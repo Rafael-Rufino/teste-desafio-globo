@@ -17,14 +17,12 @@ export const Header = () => {
     isModalVisible,
     highlights,
     modalRef,
-    query,
     handleArrowKeyNavigation,
     handleSearchChange,
     inputRef,
   } = useHeader()
 
   const debouncedHandleSearch = useDebounce(handleSearchChange, 500)
-
   return (
     <S.ContainerHeader>
       <S.Wrapper>
@@ -45,7 +43,7 @@ export const Header = () => {
             <SearchModal
               highlightSearchResult={highlights}
               suggestions={filteredSuggestionsByQuery}
-              suggestionValue={query}
+              suggestionValue={inputRef.current?.value || ''}
               isOpen={isModalVisible}
               onClose={closeModalAndResetSearch}
             />

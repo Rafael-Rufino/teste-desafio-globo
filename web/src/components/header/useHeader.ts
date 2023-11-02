@@ -23,8 +23,11 @@ const useHeader = () => {
   const modalRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const sortByLength = (a: ISuggestion, b: ISuggestion) =>
-    a.value.length - b.value.length
+  const sortSuggestions = (suggestions: ISuggestion[]) => {
+    return suggestions.slice().sort((a, b) => {
+      return a.value.length - b.value.length
+    })
+  }
 
   function normalizeData<T extends { id: string; value: string }>(
     data: T[]
@@ -48,7 +51,6 @@ const useHeader = () => {
   const fetchHighlights = useCallback(async () => {
     try {
       const highlightData = await getHighlight()
-
       const normalizedHighlights = highlightData.highlights.map(
         (highlight: IHighlight) => ({
           ...highlight,
@@ -61,100 +63,82 @@ const useHeader = () => {
     }
   }, [])
 
+  useEffect(() => {
+    fetchSuggestions()
+    fetchHighlights()
+  }, [])
+
   const filteredSuggestionsByQuery = useMemo(() => {
-    return suggestions.filter((suggestion: ISuggestion) =>
+    const inputValue = inputRef.current?.value?.trim()
+    return suggestions.filter((suggestion) =>
       normalizeString(suggestion.value).includes(
-        normalizeString(inputRef.current?.value?.trim() || '')
+        normalizeString(inputValue || '')
       )
     )
   }, [suggestions])
 
-  useEffect(() => {
-    fetchSuggestions()
-    fetchHighlights()
-  }, [fetchSuggestions, fetchHighlights])
-
-  const handleSearchChange = useCallback(() => {
+  const handleSearchChange = () => {
     const inputValue = inputRef.current?.value || ''
     const normalizedInputValue = normalizeString(inputValue.trim())
     const isSearchNotEmpty = normalizedInputValue.length > 0
-
     setOriginalValue(normalizedInputValue)
-
     const words = normalizedInputValue.split(' ')
     const filteredSuggestions = filterSuggestions(words)
     const filteredHighlightsByQuery = filterHighlightsByQuery(words)
-
     setSuggestions(filteredSuggestions)
     setHighlights(filteredHighlightsByQuery)
     setIsModalVisible(isSearchNotEmpty)
-  }, [suggestionIndex, originalValue, initialSuggestions, initialHighlights])
+  }
 
-  const filterSuggestions = useCallback(
-    (words: string[]) => {
-      return initialSuggestions
-        .filter((suggestion) => {
-          const normalizedSuggestion = normalizeString(suggestion.value)
-          const searchWords = words.map(normalizeString)
-          return searchWords.every((word) =>
-            normalizedSuggestion.includes(word)
-          )
-        })
-        .sort(sortByLength)
-    },
-    [initialSuggestions]
-  )
+  const filterSuggestions = (words: string[]) => {
+    const filteredSuggestions = initialSuggestions.filter((suggestion) => {
+      const normalizedSuggestion = normalizeString(suggestion.value)
+      const searchWords = words.map(normalizeString)
+      return searchWords.every((word) => normalizedSuggestion.includes(word))
+    })
+    return sortSuggestions(filteredSuggestions)
+  }
 
-  const filterHighlightsByQuery = useCallback(
-    (words: string[]) => {
-      return initialHighlights.filter((highlight) =>
-        highlight.queries.some((highlightQuery) =>
-          words.some((word) => highlightQuery.value.includes(word))
-        )
+  const filterHighlightsByQuery = (words: string[]) => {
+    return initialHighlights.filter((highlight) =>
+      highlight.queries.some((highlightQuery) =>
+        words.some((word) => highlightQuery.value.includes(word))
       )
-    },
-    [initialHighlights]
-  )
+    )
+  }
 
-  const handleArrowKeyNavigation = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      const isArrowRight = event.key === KEY_CODES.ARROW_RIGHT
-      const isArrowLeft = event.key === KEY_CODES.ARROW_LEFT
-      if (isArrowRight) {
-        handleArrowRight(event)
-      } else if (isArrowLeft) {
-        handleArrowLeft(event)
-      }
-    },
-    [suggestionIndex, filteredSuggestionsByQuery, originalValue, inputRef]
-  )
+  const handleArrowKeyNavigation = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    const isArrowRight = event.key === KEY_CODES.ARROW_RIGHT
+    const isArrowLeft = event.key === KEY_CODES.ARROW_LEFT
+    if (isArrowRight) {
+      handleArrowRight(event)
+    } else if (isArrowLeft) {
+      handleArrowLeft(event)
+    }
+  }
 
-  const handleArrowRight = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      event.preventDefault()
-      if (canIncrementSuggestionIndex()) {
-        updateInputValue(filteredSuggestionsByQuery[suggestionIndex + 1]?.value)
-        setSuggestionIndex(suggestionIndex + 1)
-      }
-    },
-    [suggestionIndex, filteredSuggestionsByQuery, setSuggestionIndex]
-  )
+  const handleArrowRight = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    if (canIncrementSuggestionIndex()) {
+      updateInputValue(filteredSuggestionsByQuery[suggestionIndex + 1]?.value)
+      setSuggestionIndex(suggestionIndex + 1)
+    }
+  }
 
-  const handleArrowLeft = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      event.preventDefault()
-      if (canDecrementSuggestionIndex()) {
-        const prevSuggestion = filteredSuggestionsByQuery[suggestionIndex - 1]
-        if (prevSuggestion) {
-          updateInputValue(prevSuggestion.value)
-          setSuggestionIndex(suggestionIndex - 1)
-        } else {
-          resetInputToOriginalValue()
-        }
+  const handleArrowLeft = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    if (canDecrementSuggestionIndex()) {
+      const prevSuggestion = filteredSuggestionsByQuery[suggestionIndex - 1]
+      if (prevSuggestion) {
+        updateInputValue(prevSuggestion.value)
+        setSuggestionIndex(suggestionIndex - 1)
+      } else {
+        resetInputToOriginalValue()
       }
-    },
-    [suggestionIndex, filteredSuggestionsByQuery, setSuggestionIndex]
-  )
+    }
+  }
 
   const canIncrementSuggestionIndex = () => {
     return suggestionIndex < filteredSuggestionsByQuery.length - 1

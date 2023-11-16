@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     container_name: globo_pg
-    image: postgres:13.2
+    image: postgres:latest
     restart: always
     environment:
       POSTGRES_USER: ${DB_USER}

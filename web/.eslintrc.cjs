@@ -4,13 +4,16 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:react-hooks/recommended',
     'plugin:jest/recommended',
+    'plugin:react/recommended',
+    "plugin:react-hooks/recommended",
+    "prettier"
 
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh', '@typescript-eslint', 'jest'],
+  plugins: ['react', 'react-refresh', '@typescript-eslint', 'jest', 'react-hooks', "@typescript-eslint",
+    "prettier"],
   settings: {
     react: {
       version: 'detect',
@@ -23,9 +26,12 @@ module.exports = {
 
   rules: {
     'jest/expect-expect': 'off',
+    "prettier/prettier": "error",
     'jest/valid-title': 'off',
     'jest/no-standalone-expect': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/rules-of-hooks": "error",
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },

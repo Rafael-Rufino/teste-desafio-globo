@@ -7,8 +7,8 @@ import * as S from './styles'
 import { SearchInput } from '../searchInput'
 import { SearchModal } from '../searchModal'
 
-import useHeader from './useHeader'
 import { useDebounce } from '../../hooks/useDebounce'
+import useHeader from './useHeader'
 
 export const Header = () => {
   const {
@@ -18,11 +18,11 @@ export const Header = () => {
     highlights,
     modalRef,
     handleArrowKeyNavigation,
-    handleSearchChange,
+    handleChangeSearch,
     inputRef,
   } = useHeader()
 
-  const debouncedHandleSearch = useDebounce(handleSearchChange, 500)
+  const debouncedHandleSearch = useDebounce(handleChangeSearch, 500)
   return (
     <S.ContainerHeader>
       <S.Wrapper>

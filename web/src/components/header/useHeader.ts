@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   getHighlight,
   getSuggestion,
 } from '../../services/sdk/modules/searchService'
 
-import { normalizeString } from '../../utils/normalizedString'
 import { KEY_CODES } from '../../constants/key-codes'
-import { ISuggestion, IHighlight } from '../../entities'
+import { IHighlight, ISuggestion } from '../../entities'
+import { normalizeData } from '../../utils/normalizeData'
+import { normalizeString } from '../../utils/normalizedString'
 
 const useHeader = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -27,15 +28,6 @@ const useHeader = () => {
     return suggestions.slice().sort((a, b) => {
       return a.value.length - b.value.length
     })
-  }
-
-  function normalizeData<T extends { id: string; value: string }>(
-    data: T[]
-  ): T[] {
-    return data.map((item) => ({
-      ...item,
-      value: normalizeString(item.value),
-    }))
   }
 
   const fetchSuggestions = useCallback(async () => {
@@ -64,8 +56,8 @@ const useHeader = () => {
   }, [])
 
   useEffect(() => {
-    fetchSuggestions()
     fetchHighlights()
+    fetchSuggestions()
   }, [])
 
   const filteredSuggestionsByQuery = useMemo(() => {
@@ -77,7 +69,7 @@ const useHeader = () => {
     )
   }, [suggestions])
 
-  const handleSearchChange = () => {
+  const handleChangeSearch = () => {
     const inputValue = inputRef.current?.value || ''
     const normalizedInputValue = normalizeString(inputValue.trim())
     const isSearchNotEmpty = normalizedInputValue.length > 0
@@ -90,22 +82,26 @@ const useHeader = () => {
     setIsModalVisible(isSearchNotEmpty)
   }
 
-  const filterSuggestions = (words: string[]) => {
-    const filteredSuggestions = initialSuggestions.filter((suggestion) => {
-      const normalizedSuggestion = normalizeString(suggestion.value)
-      const searchWords = words.map(normalizeString)
-      return searchWords.every((word) => normalizedSuggestion.includes(word))
-    })
-    return sortSuggestions(filteredSuggestions)
-  }
-
-  const filterHighlightsByQuery = (words: string[]) => {
-    return initialHighlights.filter((highlight) =>
-      highlight.queries.some((highlightQuery) =>
-        words.some((word) => highlightQuery.value.includes(word))
+  const filterSuggestions = useMemo(
+    () => (words: string[]) => {
+      const filteredSuggestions = initialSuggestions.filter((suggestion) =>
+        words.some((word) => normalizeString(suggestion.value).includes(word))
       )
-    )
-  }
+      return sortSuggestions(filteredSuggestions)
+    },
+    [initialSuggestions]
+  )
+
+  const filterHighlightsByQuery = useMemo(
+    () => (words: string[]) => {
+      return initialHighlights.filter((highlight) =>
+        highlight.queries.some((highlightQuery) =>
+          words.some((word) => highlightQuery.value.includes(word))
+        )
+      )
+    },
+    [initialHighlights]
+  )
 
   const handleArrowKeyNavigation = (
     event: React.KeyboardEvent<HTMLInputElement>
@@ -140,13 +136,13 @@ const useHeader = () => {
     }
   }
 
-  const canIncrementSuggestionIndex = () => {
+  const canIncrementSuggestionIndex = useCallback(() => {
     return suggestionIndex < filteredSuggestionsByQuery.length - 1
-  }
+  }, [suggestionIndex, filteredSuggestionsByQuery])
 
-  const canDecrementSuggestionIndex = () => {
-    return suggestionIndex > -1 && suggestionIndex - 1 >= 0
-  }
+  const canDecrementSuggestionIndex = useCallback(() => {
+    return suggestionIndex > -1
+  }, [suggestionIndex])
 
   const updateInputValue = (value: string) => {
     if (inputRef.current) {
@@ -193,7 +189,7 @@ const useHeader = () => {
     closeModalAndResetSearch,
     isModalVisible,
     highlights,
-    handleSearchChange,
+    handleChangeSearch,
     handleArrowKeyNavigation,
     filteredSuggestionsByQuery,
     modalRef,

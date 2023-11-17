@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import {
-  getHighlight,
-  getSuggestion,
-} from '../../services/sdk/modules/searchService'
-
 import { KEY_CODES } from '../../constants/key-codes'
 import { IHighlight, ISuggestion } from '../../entities'
+
+import { HighlightService, SuggestionService } from '../../services/module'
 import { normalizeData } from '../../utils/normalizeData'
 import { normalizeString } from '../../utils/normalizedString'
 
@@ -32,8 +29,8 @@ const useHeader = () => {
 
   const fetchSuggestions = useCallback(async () => {
     try {
-      const suggestionData = await getSuggestion()
-      const normalizedSuggestions = normalizeData(suggestionData.suggestions)
+      const suggestionList = await SuggestionService.listSuggestions()
+      const normalizedSuggestions = normalizeData(suggestionList.suggestions)
       setInitialSuggestions(normalizedSuggestions)
     } catch (error) {
       console.error('Error fetching suggestions:', error)
@@ -42,8 +39,8 @@ const useHeader = () => {
 
   const fetchHighlights = useCallback(async () => {
     try {
-      const highlightData = await getHighlight()
-      const normalizedHighlights = highlightData.highlights.map(
+      const highlightList = await HighlightService.listHighlights()
+      const normalizedHighlights = highlightList.highlights.map(
         (highlight: IHighlight) => ({
           ...highlight,
           queries: normalizeData(highlight.queries),
@@ -102,7 +99,7 @@ const useHeader = () => {
     },
     [initialHighlights]
   )
-
+  // altera a seta do teclado para direita e esquerda para navegar entre as sugestões
   const handleArrowKeyNavigation = (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
@@ -157,6 +154,7 @@ const useHeader = () => {
     setSuggestionIndex(-1)
   }
 
+  // Fecha o modal e reseta o input de busca
   const closeModalAndResetSearch = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.value = ''
@@ -164,6 +162,7 @@ const useHeader = () => {
     setIsModalVisible(false)
   }, [])
 
+  // Fecha o modal ao clicar fora dele
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (

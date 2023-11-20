@@ -1,13 +1,12 @@
 import * as S from './styles'
 
-import { Divider } from '../divider'
-
-import SearchResultNotFound from './components/searchResultNotFound'
-import SuggestionSearchLink from './components/suggestionSearchLink'
-
-import SearchResultList from './components/searchResultList'
-import SearchResultHeader from './components/highlightSearchResult'
 import { IHighlight, ISuggestion } from '../../entities'
+
+import { Divider } from '../divider'
+import SearchResultHeader from './components/highlightSearchResultLink'
+import SearchResultList from './components/searchResultList'
+import SearchResultNotFound from './components/searchResultNotFound'
+import SuggestionSearchResultLink from './components/suggestionSearchResultLink'
 
 export interface SearchModalProps {
   highlightSearchResult: IHighlight[]
@@ -33,12 +32,12 @@ export const SearchModal = ({
           {hasSearchResults && (
             <>
               <SearchResultHeader
-                highlightSearchResult={highlightSearchResult}
+                highlightSearchResultLink={highlightSearchResult}
               />
               <Divider />
               <SearchResultList suggestions={suggestions} />
               <Divider />
-              <SuggestionSearchLink
+              <SuggestionSearchResultLink
                 suggestionValue={`${suggestionValue} na Globo.com`}
                 searchUrl={`http://g1.globo.com/busca/?q=${encodeURIComponent(
                   suggestionValue
@@ -46,7 +45,7 @@ export const SearchModal = ({
                 title={`Você será redirecionado para página do Globo.com com a busca ${suggestionValue}`}
               />
               <Divider />
-              <SuggestionSearchLink
+              <SuggestionSearchResultLink
                 suggestionValue={`${suggestionValue} na Web`}
                 searchUrl={`https://www.google.com/search?q=${encodeURIComponent(
                   suggestionValue

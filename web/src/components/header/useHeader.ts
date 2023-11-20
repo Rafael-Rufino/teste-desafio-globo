@@ -30,10 +30,9 @@ const useHeader = () => {
   const fetchSuggestions = useCallback(async () => {
     try {
       const suggestionList = await SuggestionService.listSuggestions()
-      const normalizedSuggestions = normalizeData(suggestionList.suggestions)
-      setInitialSuggestions(normalizedSuggestions)
+      setInitialSuggestions(normalizeData(suggestionList.suggestions))
     } catch (error) {
-      console.error('Error fetching suggestions:', error)
+      throw new Error(error as string)
     }
   }, [])
 
@@ -48,7 +47,7 @@ const useHeader = () => {
       )
       setInitialHighlights(normalizedHighlights)
     } catch (error) {
-      console.error('Error fetching highlights:', error)
+      throw new Error(error as string)
     }
   }, [])
 

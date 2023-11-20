@@ -1,16 +1,17 @@
 import { IHighlight } from '../../../../entities'
+
 import * as S from './styles'
 
-interface HighlightSearchResultProps {
-  highlightSearchResult: IHighlight[]
+interface HighlightSearchResultLinkProps {
+  highlightSearchResultLink: IHighlight[]
 }
 
-const HighlightSearchResult = ({
-  highlightSearchResult,
-}: HighlightSearchResultProps) => {
+const HighlightSearchResultLink = ({
+  highlightSearchResultLink,
+}: HighlightSearchResultLinkProps) => {
   return (
     <S.Container>
-      {highlightSearchResult.map((highlight: IHighlight) => (
+      {highlightSearchResultLink.map((highlight: IHighlight) => (
         <S.Link
           key={highlight.id}
           href={highlight.url}
@@ -24,4 +25,4 @@ const HighlightSearchResult = ({
   )
 }
 
-export default HighlightSearchResult
+export default HighlightSearchResultLink

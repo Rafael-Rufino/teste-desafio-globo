@@ -1,16 +1,16 @@
 import * as S from './styles'
 
-interface SuggestionSearchLinkProps {
+interface SuggestionSearchResultLinkProps {
   suggestionValue: string
   searchUrl: string
   title: string
 }
 
-const SuggestionSearchLink = ({
+const SuggestionSearchResultLink = ({
   suggestionValue,
   searchUrl,
   title,
-}: SuggestionSearchLinkProps) => {
+}: SuggestionSearchResultLinkProps) => {
   return (
     <S.SuggestionsWrapper>
       <S.Container>
@@ -22,4 +22,4 @@ const SuggestionSearchLink = ({
   )
 }
 
-export default SuggestionSearchLink
+export default SuggestionSearchResultLink

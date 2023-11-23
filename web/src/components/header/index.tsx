@@ -8,7 +8,7 @@ import { SearchInput } from '../searchInput'
 import { SearchModal } from '../searchModal'
 
 import { useDebounce } from '../../hooks/useDebounce'
-import useHeader from './useHeader'
+import useHeader from './hook/useHeader'
 
 export const Header = () => {
   const {

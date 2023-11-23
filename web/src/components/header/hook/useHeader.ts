@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { KEY_CODES } from '../../constants/key-codes'
-import { IHighlight, ISuggestion } from '../../entities'
+import { KEY_CODES } from '../../../constants/key-codes'
+import { IHighlight, ISuggestion } from '../../../entities'
 
-import { HighlightService, SuggestionService } from '../../services/module'
-import { normalizeData } from '../../utils/normalizeData'
-import { normalizeString } from '../../utils/normalizedString'
+import { HighlightService, SuggestionService } from '../../../services/module'
+import { normalizeData, normalizeString } from '../../../utils'
 
 const useHeader = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -70,6 +69,7 @@ const useHeader = () => {
     const normalizedInputValue = normalizeString(inputValue.trim())
     const isSearchNotEmpty = normalizedInputValue.length > 0
     setOriginalValue(normalizedInputValue)
+
     const words = normalizedInputValue.split(' ')
     const filteredSuggestions = filterSuggestions(words)
     const filteredHighlightsByQuery = filterHighlightsByQuery(words)
@@ -78,18 +78,18 @@ const useHeader = () => {
     setIsModalVisible(isSearchNotEmpty)
   }
 
-  const filterSuggestions = useMemo(
-    () => (words: string[]) => {
-      const filteredSuggestions = initialSuggestions.filter((suggestion) =>
-        words.some((word) => normalizeString(suggestion.value).includes(word))
-      )
-      return sortSuggestions(filteredSuggestions)
-    },
+  const filterSuggestions = useCallback(
+    (words: string[]) =>
+      sortSuggestions(
+        initialSuggestions.filter((suggestion) =>
+          words.some((word) => normalizeString(suggestion.value).includes(word))
+        )
+      ),
     [initialSuggestions]
   )
 
-  const filterHighlightsByQuery = useMemo(
-    () => (words: string[]) => {
+  const filterHighlightsByQuery = useCallback(
+    (words: string[]) => {
       return initialHighlights.filter((highlight) =>
         highlight.queries.some((highlightQuery) =>
           words.some((word) => highlightQuery.value.includes(word))
@@ -99,11 +99,12 @@ const useHeader = () => {
     [initialHighlights]
   )
   // altera a seta do teclado para direita e esquerda para navegar entre as sugestões
-  const handleArrowKeyNavigation = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleArrowKeyNavigation: React.KeyboardEventHandler<
+    HTMLInputElement
+  > = (event) => {
     const isArrowRight = event.key === KEY_CODES.ARROW_RIGHT
     const isArrowLeft = event.key === KEY_CODES.ARROW_LEFT
+
     if (isArrowRight) {
       handleArrowRight(event)
     } else if (isArrowLeft) {
@@ -111,30 +112,37 @@ const useHeader = () => {
     }
   }
 
-  const handleArrowRight = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    event.preventDefault()
-    if (canIncrementSuggestionIndex()) {
-      updateInputValue(filteredSuggestionsByQuery[suggestionIndex + 1]?.value)
-      setSuggestionIndex(suggestionIndex + 1)
-    }
-  }
-
-  const handleArrowLeft = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    event.preventDefault()
-    if (canDecrementSuggestionIndex()) {
-      const prevSuggestion = filteredSuggestionsByQuery[suggestionIndex - 1]
-      if (prevSuggestion) {
-        updateInputValue(prevSuggestion.value)
-        setSuggestionIndex(suggestionIndex - 1)
-      } else {
-        resetInputToOriginalValue()
+  const handleArrowRight = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      event.preventDefault()
+      if (canIncrementSuggestionIndex()) {
+        updateInputValue(filteredSuggestionsByQuery[suggestionIndex + 1]?.value)
+        setSuggestionIndex(suggestionIndex + 1)
       }
-    }
-  }
+    },
+    [suggestionIndex, filteredSuggestionsByQuery]
+  )
 
-  const canIncrementSuggestionIndex = useCallback(() => {
-    return suggestionIndex < filteredSuggestionsByQuery.length - 1
-  }, [suggestionIndex, filteredSuggestionsByQuery])
+  const handleArrowLeft = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      event.preventDefault()
+      if (canDecrementSuggestionIndex()) {
+        const prevSuggestion = filteredSuggestionsByQuery[suggestionIndex - 1]
+        if (prevSuggestion) {
+          updateInputValue(prevSuggestion.value)
+          setSuggestionIndex(suggestionIndex - 1)
+        } else {
+          resetInputToOriginalValue()
+        }
+      }
+    },
+    [suggestionIndex, filteredSuggestionsByQuery]
+  )
+
+  const canIncrementSuggestionIndex = useCallback(
+    () => suggestionIndex < filteredSuggestionsByQuery.length - 1,
+    [suggestionIndex, filteredSuggestionsByQuery]
+  )
 
   const canDecrementSuggestionIndex = useCallback(() => {
     return suggestionIndex > -1
@@ -154,12 +162,12 @@ const useHeader = () => {
   }
 
   // Fecha o modal e reseta o input de busca
-  const closeModalAndResetSearch = useCallback(() => {
+  const closeModalAndResetSearch = () => {
     if (inputRef.current) {
       inputRef.current.value = ''
     }
     setIsModalVisible(false)
-  }, [])
+  }
 
   // Fecha o modal ao clicar fora dele
   useEffect(() => {

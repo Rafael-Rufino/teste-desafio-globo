@@ -26,31 +26,31 @@ const useHeader = () => {
     })
   }
 
-  const fetchSuggestions = useCallback(async () => {
-    try {
-      const suggestionList = await SuggestionService.listSuggestions()
-      setInitialSuggestions(normalizeData(suggestionList.suggestions))
-    } catch (error) {
-      throw new Error(error as string)
-    }
-  }, [])
-
-  const fetchHighlights = useCallback(async () => {
-    try {
-      const highlightList = await HighlightService.listHighlights()
-      const normalizedHighlights = highlightList.highlights.map(
-        (highlight: IHighlight) => ({
-          ...highlight,
-          queries: normalizeData(highlight.queries),
-        })
-      )
-      setInitialHighlights(normalizedHighlights)
-    } catch (error) {
-      throw new Error(error as string)
-    }
-  }, [])
-
   useEffect(() => {
+    const fetchHighlights = async () => {
+      try {
+        const highlightList = await HighlightService.listHighlights()
+        const normalizedHighlights = highlightList.highlights.map(
+          (highlight: IHighlight) => ({
+            ...highlight,
+            queries: normalizeData(highlight.queries),
+          })
+        )
+        setInitialHighlights(normalizedHighlights)
+      } catch (error) {
+        throw new Error(error as string)
+      }
+    }
+
+    const fetchSuggestions = async () => {
+      try {
+        const suggestionList = await SuggestionService.listSuggestions()
+        setInitialSuggestions(normalizeData(suggestionList.suggestions))
+      } catch (error) {
+        throw new Error(error as string)
+      }
+    }
+
     fetchHighlights()
     fetchSuggestions()
   }, [])
@@ -162,12 +162,12 @@ const useHeader = () => {
   }
 
   // Fecha o modal e reseta o input de busca
-  const closeModalAndResetSearch = () => {
+  const closeModalAndResetSearch = useCallback(() => {
     if (inputRef.current) {
       inputRef.current.value = ''
     }
     setIsModalVisible(false)
-  }
+  }, [])
 
   // Fecha o modal ao clicar fora dele
   useEffect(() => {
